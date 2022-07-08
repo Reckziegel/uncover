@@ -22,17 +22,16 @@ fit_ghd(.invariant, .symmetric = FALSE)
 \method{fit_ghd}{numeric}(.invariant, .symmetric = FALSE)
 }
 \arguments{
-\item{.invariant}{A tabular data structure.}
+\item{.invariant}{A tabular (non-tidy) data structure.}
 
 \item{.symmetric}{A flag. Should the estimated distribution be symmetric?
 Defaults to \code{FALSE}.}
 }
 \value{
-An object of the the class \code{mle.ghyp}.
+An object of the the class \code{uncover_fit}.
 }
 \description{
-This function is a wrapper around the \code{\link[ghyp]{fit.ghypuv}} and
-\code{\link[ghyp]{fit.ghypmv}}, that performs a maximum likelihood estimation
+This function performs a maximum likelihood estimation
 on generalized hyperbolic distribution.
 }
 \examples{
@@ -42,7 +41,7 @@ x <- matrix(diff(log(EuStockMarkets)), ncol = 4)
 
 fit_ghd(x) # multivariate estimation
 
-fit_ghd(x[ , 3, drop = FALSE]) # univariate estimation
+fit_ghd(x[ , 3]) # univariate estimation
 }
 \seealso{
 \code{\link{fit_hyp}} \code{\link{fit_nig}} \code{\link{fit_vg}} \code{\link{fit_t}}

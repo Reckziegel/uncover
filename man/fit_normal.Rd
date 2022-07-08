@@ -25,12 +25,10 @@ fit_normal(x)
 \item{x}{A tabular (non-tidy) data structure.}
 }
 \value{
-A \code{list} of the the class \code{cma_fit} with \code{21} components.
+An object of the the class \code{uncover_fit}.
 }
 \description{
-Performs maximum likelihood estimation on the normal distribution
-(univariate and multivariate). Wrappers \code{\link[ghyp]{fit.gaussuv}}
-and \code{\link[ghyp]{fit.gaussmv}}.
+This function performs maximum likelihood estimation on the normal distribution.
 }
 \examples{
 x <- matrix(diff(log(EuStockMarkets)), ncol = 4)
@@ -39,7 +37,7 @@ x <- matrix(diff(log(EuStockMarkets)), ncol = 4)
 fit_normal(x)
 
 # univariate estimation
-fit_normal(x[ , 4, drop = FALSE])
+fit_normal(x[ , 4])
 }
 \seealso{
 \code{\link{fit_ghd}} \code{\link{fit_hyp}} \code{\link{fit_nig}}

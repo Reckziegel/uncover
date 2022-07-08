@@ -6,25 +6,30 @@ template:
 reference:
 
     - title: Uncover the "Market" Distribution
-      desc: Distribution selection via AIC Criteria
+      desc: Search for Distributions
       contents:
       - reveal
 
     - title: Non-Parametric Approach
-      desc: Historical Scenarios Estimation
+      desc: Historical Estimation
       contents:
       - bootstrap_scenarios
       - ffp_moments
 
     - title: Parametric Approach
-      desc: Analytical Distributions Estimation
+      desc: Analytical Estimation
       contents:
       - fit_ghd
       - fit_hyp
       - fit_nig
-      - fit_normal
-      - fit_t
       - fit_vg
+      - fit_t
+      - fit_normal
+
+    - title: Simulation
+      desc: Tools for Analytical distributions
+      contents:
+      - simulate_margins
 
 
 

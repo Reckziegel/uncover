@@ -1,6 +1,6 @@
 Package: uncover
 Type: Package
-Title: Distributional and Historical estimation of "invariant"" time-series
+Title: Analytical and Historical estimation of "invariant" time-series
 Version: 0.1.0
 Author: Bernardo Reckziegel
 Maintainer: Bernardo Reckziegel <bernardo_cse@hotmail.com>
@@ -21,3 +21,4 @@ Imports:
     vctrs
 RoxygenNote: 7.2.0
 URL: https://reckziegel.github.io/uncover/
+BugReports: https://github.com/Reckziegel/uncover/issues

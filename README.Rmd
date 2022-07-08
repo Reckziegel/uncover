@@ -16,16 +16,133 @@ knitr::opts_chunk$set(
 # uncover
 
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-CMD-check](https://github.com/Reckziegel/uncover/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Reckziegel/uncover/actions/workflows/R-CMD-check.yaml)
+
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental) [![R-CMD-check](https://github.com/Reckziegel/uncover/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Reckziegel/uncover/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
+
+The goal of `uncover` is to help users to perform the second step in Meucci’s Checklist: __Estimation__.
 
 ## Installation
 
-You can install the development version of uncover from [GitHub](https://github.com/) with:
+You can install the development version of `uncover` from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("Reckziegel/uncover")
 ```
 
+## Usage
+
+From __The Prayer__:
+
+> "*...the estimation step is the process of fitting a distribution to both, the observed past realizations of the invariants, and (optionally) additional information that is available at the current time* $T$..."
+
+In `uncover` the "market" distribution can be estimated from historical scenarios or through the analytical approach. 
+
+This brief introduction presents both.
+
+```{r, warning=FALSE, message=FALSE}
+# set up
+library(tidyverse)
+library(uncover)
+library(ffp)
+
+set.seed(123)
+
+# invariants
+x <- as_tibble(diff(log(EuStockMarkets)))
+x
+```
+
+## Analytical Solution
+
+Start with `reveal` to figure out which distribution presents the "best" _in-sample_ fit according to the AIC criteria:
+
+```{r}
+reveal(x)
+```
+
+In the current sample, the asymmetric Generalized Hyperbolic Distribution (GHD) fits best. To model the GHP use `fit_ghp`:
+
+```{r}
+fit <- fit_ghd(x)
+fit
+```
+
+The family of functions `fit_*()` is available for different distribution specifications, which include:
+
+- `fit_ghd`: for the [generalized hyperbolic distribution](https://en.wikipedia.org/wiki/Generalised_hyperbolic_distribution)
+- `fit_hyp`: for the [hyperbolic distribution](https://en.wikipedia.org/wiki/Hyperbolic_distribution)
+- `fit_nig`: for the [generalized inverse gaussian distribution](https://en.wikipedia.org/wiki/Generalized_inverse_Gaussian_distribution#:~:text=In%20probability%20theory%20and%20statistics%2C%20the%20generalized%20inverse,b%20%3E%200%20and%20p%20a%20real%20parameter.)
+- `fit_vg`: for the [variance gamma distribution](https://en.wikipedia.org/wiki/Variance-gamma_distribution#:~:text=The%20variance-gamma%20distribution%2C%20generalized%20Laplace%20distribution%20or%20Bessel,distribution%20decrease%20more%20slowly%20than%20the%20normal%20distribution.)
+- `fit_t`: for the [student-t distribution](https://en.wikipedia.org/wiki/Student%27s_t-distribution)
+- `fit_normal`: for the [normal distribution](https://en.wikipedia.org/wiki/Normal_distribution)
+
+Once a target distribution is chosen, the randomness of the "market" can be simulated in a large panel with `simulate_margins`:
+
+```{r}
+dist <- simulate_margins(model = fit, n = 100000)
+dist
+```
+
+## Historical Scenarios
+
+Historical scenarios play nice with the [Fully Flexible Probabilities](https://reckziegel.github.io/FFP/). 
+Bootstrapping can be done very quickly in this approach:
+
+```{r}
+# prior probabilities
+p <- rep(1 / nrow(x), nrow(x))
+
+boot <- bootstrap_scenarios(x = x, p = as_ffp(p), n = 100000)
+boot
+```
+
+To "twick" the probability vector, use any of the functions avaiable in the [ffp](https://reckziegel.github.io/FFP/) package. 
+
+Here, probabilities are modeled as an exponential decay, in order to give more importance to recent events:
+
+```{r}
+# Exponential Smoothing
+probs <- exp_decay(x = x, lambda = 0.01)
+
+boot_decay <- bootstrap_scenarios(x = x, p = probs, n = 100000)
+boot_decay
+```
+
+For more details on flexible probabilities, please, refer to the [ffp](https://reckziegel.github.io/FFP/) package and the papers bellow:
+
+- [Fully Flexible Views: Theory and Practice](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1213325)
+- [Historical Scenarios with Fully Flexible Probabilities](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1696802) 
+
+## Estimation Risk
+
+From now on the "estimation risk" takes place which will have an impact on the entire Checklist. 
+
+```{r, message=FALSE, warning=FALSE}
+dist_tidy <- dist |> 
+  pivot_longer(cols = everything()) |> 
+  add_column(Type = "Analytical")
+boot_tidy <- boot |> 
+  pivot_longer(cols = everything()) |> 
+  add_column(Type = "Historical")
+exp_tidy <- boot_decay |> 
+  pivot_longer(cols = everything()) |> 
+  add_column(Type = "Historical FFP")
+
+# plot
+bind_rows(dist_tidy, boot_tidy, exp_tidy) |> 
+  ggplot(aes(x = value, y = ..density.., color = Type, fill = Type)) + 
+  geom_histogram(position = "identity", alpha = 0.5, bins = 100) + 
+  facet_wrap(~name) + 
+  scale_color_viridis_d(end = 0.75) + 
+  scale_fill_viridis_d(end = 0.75) + 
+  scale_x_continuous(labels = scales::percent_format(), limits = c(-0.05, 0.05)) +
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL) + 
+  theme(legend.position = "bottom")
+```
+
+## Reference
+
+- Meucci, Attilio, ‘The Prayer’ Ten-Step Checklist for Advanced Risk and Portfolio Management (February 2, 2011). Available at SSRN: https://ssrn.com/abstract=1753788 or http://dx.doi.org/10.2139/ssrn.1753788

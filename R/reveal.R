@@ -1,10 +1,10 @@
-#' Distribution Selection with AIC Criterion
+#' Distribution Selection with AIC Criteria
 #'
 #' Performs a maximum likelihood estimation for univariate and
 #' multivariate generalized hyperbolic distributions and reorder the fitted models
-#' based on AIC information criterion. It's a wrapper around \code{\link[ghyp]{stepAIC.ghyp}}.
+#' based on AIC information criteria.
 #'
-#' @param .invariant A univariate or multivariate tabular (non-tidy) time-series.
+#' @param .invariant A tabular (non-tidy) time-series.
 #' @param .silent A logical. Should the optimization results be printed? The default is \code{TRUE}.
 #' @param ... Additional arguments the user may want to pass to \code{\link[ghyp]{fit.ghypuv}}.
 #'
@@ -51,6 +51,12 @@ reveal.xts <- function(.invariant, .silent = TRUE, ...) {
 #' @rdname reveal
 #' @export
 reveal.matrix <- function(.invariant, .silent = TRUE, ...) {
+  reveal_(.invariant = .invariant, .silent = .silent, ...)
+}
+
+#' @rdname reveal
+#' @export
+reveal.numeric <- function(.invariant, .silent = TRUE, ...) {
   reveal_(.invariant = .invariant, .silent = .silent, ...)
 }
 

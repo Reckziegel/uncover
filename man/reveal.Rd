@@ -6,7 +6,8 @@
 \alias{reveal.tbl_df}
 \alias{reveal.xts}
 \alias{reveal.matrix}
-\title{Distribution Selection with AIC Criterion}
+\alias{reveal.numeric}
+\title{Distribution Selection with AIC Criteria}
 \usage{
 reveal(.invariant, .silent = TRUE, ...)
 
@@ -17,9 +18,11 @@ reveal(.invariant, .silent = TRUE, ...)
 \method{reveal}{xts}(.invariant, .silent = TRUE, ...)
 
 \method{reveal}{matrix}(.invariant, .silent = TRUE, ...)
+
+\method{reveal}{numeric}(.invariant, .silent = TRUE, ...)
 }
 \arguments{
-\item{.invariant}{A univariate or multivariate tabular (non-tidy) time-series.}
+\item{.invariant}{A tabular (non-tidy) time-series.}
 
 \item{.silent}{A logical. Should the optimization results be printed? The default is \code{TRUE}.}
 
@@ -31,7 +34,7 @@ A \code{tibble} with the fitted parameters: 11 rows and 8 columns.
 \description{
 Performs a maximum likelihood estimation for univariate and
 multivariate generalized hyperbolic distributions and reorder the fitted models
-based on AIC information criterion. It's a wrapper around \code{\link[ghyp]{stepAIC.ghyp}}.
+based on AIC information criteria.
 }
 \examples{
 x <- matrix(diff(log(EuStockMarkets)), ncol = 4)
